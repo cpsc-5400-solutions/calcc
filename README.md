@@ -203,6 +203,7 @@ Here is what the equivalent CIL would be, with comments to explain what's going 
     callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
     call void [System.Console]System.Console::WriteLine(int32)
 
+// Postamble
     ret
 }
 ```
