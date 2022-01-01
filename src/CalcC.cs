@@ -10,24 +10,32 @@ namespace CalcC
 
         public void CompileToCil(string src)
         {
+            // Preamble:
+            // * Initialize the assembly
+            // * Declare `static void main()` function
+            // * Declare two local variables: the Stack and the registers Dictionary<>
+            // * Call the constructors on the Stack<> and the registers Dictionary<>
             var cil = @"
+// Preamble
 .assembly _ { }
 
 .method public hidebysig static void main() cil managed
 {
     .entrypoint
     .maxstack 3
+
+    // Declare two local vars: a Stack<int> and a Dictionary<char, int>
     .locals init (
         [0] class [System.Collections]System.Collections.Generic.Stack`1<int32> stack,
         [1] class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32> registers
     )
 
-    nop
+    // Initialize the Stack<>
     newobj instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::.ctor()
     stloc.0
+    // Initialize the Dictionary<>
     newobj instance void class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::.ctor()
     stloc.1
-
 ";
 
             foreach (var token in src.Split(' ').Select(t => t.Trim()))
@@ -38,6 +46,7 @@ namespace CalcC
                 {
                     case Number:
                         cil += $@"
+    // Push {token} on the stack
     ldloc.0
     ldc.i4.{token}
     callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
@@ -56,14 +65,13 @@ namespace CalcC
                             _ => throw new InvalidOperationException(nameof(token)),
                         };
                         cil += $@"
+    // Pop two values on the stack, execute a {instruction} operation, and push the result
     ldloc.0
     ldloc.0
     callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
     ldloc.0
     callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
-
     {instruction}
-
     callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
 ";
                         break;
@@ -71,6 +79,7 @@ namespace CalcC
                     case StoreInstruction:
                         var register = token[1];
                         cil += $@"
+    // Pop the stack and store it in register '{register}'
     ldloc.1
     ldc.i4.s {(int)register}
     ldloc.0
@@ -82,6 +91,7 @@ namespace CalcC
                     case RetrieveInstruction:
                         register = token[1];
                         cil += $@"
+    // Push the value of register '{register}' onto the stack
     ldloc.0
     ldloc.1
     ldc.i4.s {(int)register}
@@ -92,7 +102,9 @@ namespace CalcC
                 }
             }
 
+            // Postamble.  Pop the top of the stack and print whatever is there.
             cil += @"
+    // Pop the top of the stack and print it
     ldloc.0
     callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
     call void [System.Console]System.Console::WriteLine(int32)

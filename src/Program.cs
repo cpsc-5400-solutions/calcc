@@ -8,7 +8,7 @@ namespace CalcC
         {
             var compiler = new CalcC();
             compiler.CompileToCil("3 4 + sx rx rx *");
-            compiler.CompileToObjectCode();
+            compiler.AssembleToObjectCode();
 
             Console.WriteLine("Generated CIL code:");
             Console.WriteLine(compiler.Cil);
