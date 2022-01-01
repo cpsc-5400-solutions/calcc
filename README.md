@@ -25,6 +25,8 @@ Likewise, when you're writing the output of the compiler (in our case, CIL code)
 - the _postamble_, which is just the stuff at the bottom
 - _idioms_, which are just little chunks of code that translate directly to something in the source
 
+When writing a compiler, you can expect to write a _lot_ of small classes and a bunch of long `if-else` and `switch-case` statements.
+
 One of the things I hope you get out of this assignment is being able to break down the input into little pieces and then translate each of those pieces into a little idiom of CIL in the output.
 
 ## The calculator language
@@ -90,7 +92,7 @@ The output of this program will be
 
 CIL (formerly MSIL) is the pseudo-assembly language of .NET. You can easily see what CIL is generated for a C# program at [sharplab.io](https://sharplab.io).
 
-In C#, `3 4 + sx rx rx *` might look like this:
+One way to solve this assignment is to think about what the program would look like if you wrote it in C#. `3 4 + sx rx rx *` might look like this:
 
 ```csharp
 using System;
@@ -100,8 +102,11 @@ static class Program
 {
     static void Main(string[] args)
     {
+        // set up our stack and registers
         var stack = new Stack<int>();
         var registers = new Dictionary<char,int>();
+
+        // calculate the expression
         stack.Push(3);
         stack.Push(4);
         stack.Push(stack.Pop()+stack.Pop());
@@ -109,6 +114,8 @@ static class Program
         stack.Push(registers['x']);
         stack.Push(registers['x']);
         stack.Push(stack.Pop()*stack.Pop());
+
+        // print the results
         Console.WriteLine(stack.Pop());
     }
 }
@@ -116,10 +123,88 @@ static class Program
 
 This is simple enough--use a `Stack<int>` to be the calculation stack and a `Dictionary<char,int>` to store the registers.
 
-If you paste that code into [sharplab.io](https://sharplab.io) to see the CIL, **do not be intimidated by the output!** Most of the output is "boilerplate".
+(If you paste that code into [sharplab.io](https://sharplab.io) to see the CIL, **do not be intimidated by the output!** Most of the output is "boilerplate".)
 
 Here is what the equivalent CIL would be, with comments to explain what's going on:
 
 ```
+// Preamble
+.assembly _ { }
 
+.method public hidebysig static void main() cil managed
+{
+    .entrypoint
+    .maxstack 3
+
+    // Declare two local vars: a Stack<int> and a Dictionary<char, int>
+    .locals init (
+        [0] class [System.Collections]System.Collections.Generic.Stack`1<int32> stack,
+        [1] class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32> registers
+    )
+
+    // Initialize the Stack<>
+    newobj instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::.ctor()
+    stloc.0
+    // Initialize the Dictionary<>
+    newobj instance void class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::.ctor()
+    stloc.1
+
+    // Push 3 on the stack
+    ldloc.0
+    ldc.i4.3
+    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
+
+    // Push 4 on the stack
+    ldloc.0
+    ldc.i4.4
+    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
+
+    // Pop two values on the stack, execute a add operation, and push the result
+    ldloc.0
+    ldloc.0
+    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
+    ldloc.0
+    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
+    add
+    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
+
+    // Pop the stack and store it in register 'x'
+    ldloc.1
+    ldc.i4.s 120
+    ldloc.0
+    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
+    callvirt instance void class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::set_Item(!0, !1)
+
+    // Push the value of register 'x' onto the stack
+    ldloc.0
+    ldloc.1
+    ldc.i4.s 120
+    callvirt instance !1 class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::get_Item(!0)
+    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
+
+    // Push the value of register 'x' onto the stack
+    ldloc.0
+    ldloc.1
+    ldc.i4.s 120
+    callvirt instance !1 class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::get_Item(!0)
+    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
+
+    // Pop two values on the stack, execute a mul operation, and push the result
+    ldloc.0
+    ldloc.0
+    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
+    ldloc.0
+    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
+    mul
+    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
+
+    // Pop the top of the stack and print it
+    ldloc.0
+    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
+    call void [System.Console]System.Console::WriteLine(int32)
+
+    ret
+}
 ```
+
+While this may look very complicated, you should notice some repetitive code blocks, like pushing numbers on the stack or retrieving the value in a register.
