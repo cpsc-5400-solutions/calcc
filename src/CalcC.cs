@@ -38,83 +38,8 @@ namespace CalcC
                 // If you get stuck, think about what the
                 // code would look like in C# and use
                 // sharplab.io to see what the CIL would be.
-                switch (tokenType)
-                {
-                    case Number:
-                        cil += $@"
-    // Push {token} on the stack
-    ldloc.0
-    ldc.i4.s {token}
-    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
-";
-                        break;
-
-                    case BinaryOperator:
-                        var instruction = token switch
-                        {
-                            "+" => "add",
-                            "-" => "sub",
-                            "*" => "mul",
-                            "/" => "div",
-                            "%" => "rem",
-                            _ => throw new InvalidOperationException(nameof(token)),
-                        };
-                        cil += $@"
-    // Pop two values off the stack, execute a {instruction} operation, and push the result
-    ldloc.0
-    ldloc.0
-    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
-    ldloc.0
-    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
-    {instruction}
-    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
-";
-                        break;
-
-                    case UnaryOperator:
-                        switch (token)
-                        {
-                            case "sqrt":
-                                cil += $@"
-    // Pop one value off the stack, execute a {token} operation, and push the result
-    ldloc.0
-    ldloc.0
-    callvirt instance !0 class [System.Collections] System.Collections.Generic.Stack`1<int32>::Pop()
-    conv.r8
-    call float64[System.Private.CoreLib] System.Math::Sqrt(float64)
-    conv.ovf.i4
-    callvirt instance void class [System.Collections] System.Collections.Generic.Stack`1<int32>::Push(!0)
-";
-                                break;
-                            default:
-                                throw new InvalidOperationException(nameof(token));
-                        }
-                        break;
-
-                    case StoreInstruction:
-                        var register = token[1];
-                        cil += $@"
-    // Pop the stack and store it in register '{register}'
-    ldloc.1
-    ldc.i4.s {(int)register}
-    ldloc.0
-    callvirt instance !0 class [System.Collections]System.Collections.Generic.Stack`1<int32>::Pop()
-    callvirt instance void class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::set_Item(!0, !1)
-";
-                        break;
-
-                    case RetrieveInstruction:
-                        register = token[1];
-                        cil += $@"
-    // Push the value of register '{register}' onto the stack
-    ldloc.0
-    ldloc.1
-    ldc.i4.s {(int)register}
-    callvirt instance !1 class [System.Private.CoreLib]System.Collections.Generic.Dictionary`2<char, int32>::get_Item(!0)
-    callvirt instance void class [System.Collections]System.Collections.Generic.Stack`1<int32>::Push(!0)
-";
-                        break;
-                }
+                
+                throw new NotImplementedException();
             }
 
             // Emit the postamble.
@@ -130,45 +55,7 @@ namespace CalcC
         // types are given to you in TokenType.cs.
         private static TokenType GetTokenType(string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return Blank;
-            }
-            else if (token[0] >= '0' && token[0] <= '9')
-            {
-                return Number;
-            }
-            else if (token[0] == '-')
-            {
-                if (token.Length == 1)
-                {
-                    return BinaryOperator;
-                }
-                else
-                {
-                    return Number;
-                }
-            }
-            else if ("+*/%".IndexOf(token[0]) > -1)
-            {
-                return BinaryOperator;
-            }
-            else if (token == "sqrt")
-            {
-                return UnaryOperator;
-            }
-            else if (token[0] == 's')
-            {
-                return StoreInstruction;
-            }
-            else if (token[0] == 'r')
-            {
-                return RetrieveInstruction;
-            }
-            else
-            {
-                return Unknown;
-            }
+            throw new NotImplementedException();
         }
 
         // Preamble:
