@@ -92,7 +92,7 @@ The output of this program will be
 
 ## Compilation to CIL
 
-CIL (formerly MSIL) is the pseudo-assembly language of .NET. You can easily see what CIL is generated for a C# program at [sharplab.io](https://sharplab.io).
+[CIL (formerly MSIL)](https://en.wikipedia.org/wiki/Common_Intermediate_Language) is the pseudo-assembly language of .NET. You can easily see what CIL is generated for a C# program at [sharplab.io](https://sharplab.io).
 
 One way to solve this assignment is to think about what the program would look like if you wrote it in C#. `3 4 + sx rx rx *` might look like this:
 
@@ -226,6 +226,7 @@ While this may look very complicated, you should notice some repetitive code blo
 ### CIL resources
 
 -   https://weblogs.asp.net/kennykerr/Tags/Introduction%20to%20MSIL, articles 1-2
+-   https://en.wikipedia.org/wiki/Common_Intermediate_Language
 -   https://en.wikipedia.org/wiki/List_of_CIL_instructions
 -   https://sharplab.io
 
