@@ -4,7 +4,8 @@ namespace CalcC
     {
         Unknown,
         Number,
-        Operator,
+        UnaryOperator,
+        BinaryOperator,
         StoreInstruction,
         RetrieveInstruction,
         Blank,

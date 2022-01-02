@@ -9,21 +9,23 @@ This project has several purposes:
 1. To build a minimal compiler that targets MSIL/CIL code (the pseudo-assembly language of .NET)
 1. To convince you that compilers aren't magic!
 
+See the bottom of this document for specific instructions on the assignment.
+
 ## Compilers aren't magic!
 
 They're just _tedious_.
 
 What do I mean by that? The key to understanding and writing compilers is to break things down into tiny, repeatable patterns. Examples of these patterns are:
 
-- _keywords_, like `if` and `for`
-- _binary expressions_, like `3 + 3`
-- _statements_, like `var x = 3 * y;`
+-   _keywords_, like `if` and `for`
+-   _binary expressions_, like `3 + 3`
+-   _statements_, like `var x = 3 * y;`
 
 Likewise, when you're writing the output of the compiler (in our case, CIL code), you want to break it down into pieces, too, like:
 
-- the _preamble_, the stuff that you have to put at the top of the file, just because
-- the _postamble_, which is just the stuff at the bottom
-- _idioms_, which are just little chunks of code that translate directly to something in the source
+-   the _preamble_, the stuff that you have to put at the top of the file, just because
+-   the _postamble_, which is just the stuff at the bottom
+-   _idioms_, which are just little chunks of code that translate directly to something in the source
 
 When writing a compiler, you can expect to write a _lot_ of small classes and a bunch of long `if-else` and `switch-case` statements.
 
@@ -49,12 +51,12 @@ The output of this program will be
 
 Your compiler must support the following operators:
 
-- `+` add
-- `-` subtract
-- `*` multiply
-- `/` divide
-- `%` modulus (aka remainder)
-- `sqrt` square root
+-   `+` add
+-   `-` subtract
+-   `*` multiply
+-   `/` divide
+-   `%` modulus (aka remainder)
+-   `sqrt` square root
 
 (You only need to support integers; we don't need to worry about floating point numbers.)
 
@@ -209,3 +211,27 @@ Here is what the equivalent CIL would be, with comments to explain what's going 
 ```
 
 While this may look very complicated, you should notice some repetitive code blocks, like pushing numbers on the stack or retrieving the value in a register.
+
+# Assignment
+
+1. Install .NET 5 [from here](https://dotnet.microsoft.com/en-us/download/dotnet/5.0). _Make sure to install the SDK_, not the Runtime.
+1. Install Visual Studio Code (aka `vscode`) [from here](https://code.visualstudio.com/download).
+1. Clone this assignment from Github to your local machine. I find [Github Desktop](https://desktop.github.com/) to be handy for this, since Github integrates with it very easily.
+1. Open the cloned directory in vscode.
+1. When vscode prompts you to install the recommended extensions, do it.
+1. Find the two functions that have `TODO` comments. Your job is to fill in the missing code such that the tests all pass.
+1. When you have code working, commit it to Github using vscode. Google how to do that if you aren't sure.
+1. I'll be able to see if your code passes the tests.
+
+### CIL resources
+
+-   https://weblogs.asp.net/kennykerr/Tags/Introduction%20to%20MSIL, articles 1-2
+-   https://en.wikipedia.org/wiki/List_of_CIL_instructions
+-   https://sharplab.io
+
+### Some notes
+
+-   Basically, your job is to take the string `3 4 + sx rx rx *` and turn it into that big lump of CIL above--and I've already given you the preamble and postamble.
+-   Make use of [sharplab.io](https://sharplab.io) for hints on what CIL instructions to use!
+-   The square root function in C# is `double Math.Sqrt(double)`. To convert from `int` to `double`, use the `conv.r8` instruction. To convert from `double` to `int`, use the `conv.ovf.i4` instruction.
+-   There are tons of tutorials out there on how to clone from Github and commit your code back to it.

@@ -18,7 +18,8 @@ namespace CalcC
 
         public void Info(string message)
         {
-            Console.Error.WriteLine($"* INF {message}");
+            // Only show errors and warnings.
+            // Console.Error.WriteLine($"* INF {message}");
         }
 
         public void Warning(string message)
